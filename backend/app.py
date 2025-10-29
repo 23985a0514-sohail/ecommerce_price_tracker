@@ -6,6 +6,11 @@ import os
 app = Flask(__name__)
 CORS(app, resources={r"/*": {"origins": "*"}})
 
+@app.route("/", methods=["GET"])
+def home():
+    return jsonify({"message": "Backend is running"}), 200
+
+
 @app.route("/track", methods=["POST"])
 def track():
     try:
