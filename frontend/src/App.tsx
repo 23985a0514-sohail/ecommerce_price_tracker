@@ -65,8 +65,8 @@ function App() {
           <div className="grid grid-cols-2 font-semibold text-gray-100 bg-gray-700/90 
                     border border-gray-600 rounded-lg px-3 py-2 mb-2 shadow-md 
                     sticky top-0 z-10 backdrop-blur-sm">
-            <span>Product Name</span>
-            <span className="text-right">Price</span>
+            <span className="font-semibold text-blue-400">Product Name</span>
+            <span className="text-right font-semibold text-blue-400">Price</span>
           </div>
           <div className="max-h-96 overflow-y-auto space-y-2">
             {results.flipkart?.length > 0 ? (
