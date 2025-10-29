@@ -48,7 +48,7 @@ function App() {
 
       {results && (
   <div className="mt-6 bg-gray-800 rounded-xl p-6 shadow-lg w-full max-w-2xl relative overflow-hidden">
-    <h2 className="text-xl font-semibold mb-3 text-white">Results from Flipkart</h2>
+    <h2 className="text-xl font-semibold mb-3 text-red-300">Results from Flipkart</h2>
 
     {/* Sticky Highlighted Header */}
     <div className="grid grid-cols-2 font-semibold text-gray-100 bg-blue-700/90 
