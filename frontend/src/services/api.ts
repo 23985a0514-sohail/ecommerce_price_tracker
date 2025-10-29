@@ -1,21 +1,15 @@
-const API_URL = 'import.meta.env.VITE_API_URL';
+const API_URL = import.meta.env.VITE_API_URL;
 
-export async function trackProduct(product: string) {
-  try {
-    const response = await fetch(`${API_URL}/track`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ product }),
-    });
+export const trackProduct = async (product: string) => {
+  const res = await fetch(`${API_URL}/track`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ product }),
+  });
 
-    if (!response.ok) {
-      const errText = await response.text();
-      throw new Error(`HTTP ${response.status}: ${errText}`);
-    }
-
-    return await response.json();
-  } catch (error: any) {
-    console.error("Error in trackProduct:", error);
-    throw new Error("Failed to fetch product data");
+  if (!res.ok) {
+    throw new Error(`Failed to fetch product data (Status: ${res.status})`);
   }
-}
+
+  return await res.json();
+};
