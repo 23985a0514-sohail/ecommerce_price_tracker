@@ -8,6 +8,17 @@ function App() {
   const [results, setResults] = useState<any>(null);
   const [error, setError] = useState<string | null>(null);
   const [history, setHistory] = useState<any[]>([]);
+  const CustomTooltip = ({ active, payload, label }) => {
+    if (active && payload && payload.length) {
+      return (
+        <div className="bg-gray-800 p-3 rounded-lg shadow-lg border border-teal-400">
+          <p className="text-sm text-gray-300">{`Date: ${label}`}</p>
+          <p className="text-teal-400 font-semibold">{`₹${payload[0].value}`}</p>
+        </div>
+      );
+    }
+    return null;
+  };
 
   const handleTrack = async () => {
     if (!query) return;
@@ -95,7 +106,7 @@ function App() {
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis dataKey="timestamp" tick={{ fill: "#ccc", fontSize: 12 }} />
               <YAxis tick={{ fill: "#ccc", fontSize: 12 }} />
-              <Tooltip />
+              <Tooltip content={<CustomTooltip />} />
               <Line type="monotone" dataKey="price" stroke="#00ffcc" strokeWidth={2} />
             </LineChart>
           </ResponsiveContainer>
