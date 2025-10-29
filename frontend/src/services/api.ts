@@ -1,5 +1,3 @@
-const API_URL = 'import.meta.env.VITE_API_URL'
-
 export const trackProduct = async (product: string) => {
   const response = await fetch(`${API_URL}/track`, {
     method: "POST",
@@ -7,9 +5,10 @@ export const trackProduct = async (product: string) => {
     body: JSON.stringify({ product }),
   });
 
-  if (!response.ok) {
-    throw new Error("Failed to fetch");
+  const text = await response.text();
+  try {
+    return JSON.parse(text);
+  } catch {
+    throw new Error(`Invalid JSON response: ${text}`);
   }
-
-  return response.json();
 };
