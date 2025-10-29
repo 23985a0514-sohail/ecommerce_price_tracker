@@ -4,13 +4,14 @@
   "private": true,
   "scripts": {
     "prebuild": "chmod +x node_modules/.bin/vite",
-  "build": "npx vite build",
-  "start": "vite"
+    "build": "npx vite build",
+    "start": "vite"
   },
   "dependencies": {
     "axios": "^1.4.0",
     "react": "^18.2.0",
-    "react-dom": "^18.2.0"
+    "react-dom": "^18.2.0",
+    "recharts": "^3.3.0"
   },
   "devDependencies": {
     "@types/react": "^18.0.37",
