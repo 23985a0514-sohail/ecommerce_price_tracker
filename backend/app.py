@@ -1,8 +1,11 @@
 # app.py
 from flask import Flask, request, jsonify
 from flask_cors import CORS
+from flask_caching import Cache
+from flask_compress import Compress
 from scraper.flipkart_scraper import scrape_flipkart
 from apscheduler.schedulers.background import BackgroundScheduler
+from performance_monitor import timing_decorator, get_performance_stats
 import sqlite3
 import os
 from datetime import datetime
@@ -10,10 +13,16 @@ from datetime import datetime
 app = Flask(__name__)
 CORS(app, resources={r"/*": {"origins": "*"}})
 
+# Initialize caching and compression for performance
+cache = Cache(app, config={'CACHE_TYPE': 'SimpleCache', 'CACHE_DEFAULT_TIMEOUT': 3600})
+compress = Compress(app)
+
 DB_PATH = "tracker.db"
 
 # 🔹 Get full price history for a product
 @app.route("/history/<product>", methods=["GET"])
+@cache.cached(timeout=600, query_string=True)  # Cache for 10 minutes
+@timing_decorator("/history/<product>")
 def get_history(product):
     conn = sqlite3.connect(DB_PATH)
     c = conn.cursor()
@@ -67,6 +76,7 @@ def save_to_db(product, results):
 
 # 🔹 Manual tracking endpoint
 @app.route("/track", methods=["POST"])
+@timing_decorator("/track")
 def track():
     try:
         data = request.get_json(force=True)
@@ -75,7 +85,18 @@ def track():
         if not product_name:
             return jsonify({"error": "No product name provided"}), 400
 
-        flipkart_data = scrape_flipkart(product_name)
+        # Check cache first
+        cache_key = f"scrape_{product_name}"
+        cached_data = cache.get(cache_key)
+        
+        if cached_data:
+            print(f"[CACHE HIT] Using cached data for {product_name}")
+            flipkart_data = cached_data
+        else:
+            print(f"[CACHE MISS] Scraping fresh data for {product_name}")
+            flipkart_data = scrape_flipkart(product_name)
+            cache.set(cache_key, flipkart_data, timeout=3600)  # Cache for 1 hour
+        
         save_to_db(product_name, flipkart_data)
         return jsonify({"flipkart": flipkart_data})
 
@@ -86,6 +107,8 @@ def track():
 
 # 🔹 Get latest tracked products
 @app.route("/latest", methods=["GET"])
+@cache.cached(timeout=300)  # Cache for 5 minutes
+@timing_decorator("/latest")
 def get_latest():
     conn = sqlite3.connect(DB_PATH)
     c = conn.cursor()
@@ -122,6 +145,12 @@ def scheduled_scrape():
 scheduler = BackgroundScheduler()
 scheduler.add_job(scheduled_scrape, "interval", hours=6)  # runs every 6 hours
 scheduler.start()
+
+
+# 🔹 Performance stats endpoint
+@app.route("/performance", methods=["GET"])
+def performance_stats():
+    return jsonify(get_performance_stats())
 
 
 if __name__ == "__main__":

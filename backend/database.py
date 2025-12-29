@@ -10,6 +10,12 @@ def init_db():
                     price REAL,
                     date TIMESTAMP DEFAULT CURRENT_TIMESTAMP
                 )''')
+    
+    # Add indexes for performance optimization
+    c.execute('CREATE INDEX IF NOT EXISTS idx_product ON prices(product)')
+    c.execute('CREATE INDEX IF NOT EXISTS idx_date ON prices(date)')
+    c.execute('CREATE INDEX IF NOT EXISTS idx_site_product ON prices(site, product)')
+    
     conn.commit()
     conn.close()
 

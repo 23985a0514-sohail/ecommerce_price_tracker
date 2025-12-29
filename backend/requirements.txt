@@ -7,3 +7,5 @@ requests
 gunicorn
 flask-cors
 apscheduler
+Flask-Caching
+Flask-Compress
